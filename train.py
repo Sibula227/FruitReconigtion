@@ -21,14 +21,29 @@ device = torch.device(
 )
 
 print(f"Device: {device}")
-
+SAVE_PATH = os.environ.get(
+    "SAVE_PATH",
+    "checkpoints/fruit_resnet18.pth"
+)
 
 # ======================
 # Dataset Path
 # ======================
 
-TRAIN_PATH = "FruitDataset/train"
-VAL_PATH = "FruitDataset/validation"
+DATASET_PATH = os.environ.get(
+    "DATASET_PATH",
+    "FruitDataset"
+)
+
+TRAIN_PATH = os.path.join(
+    DATASET_PATH,
+    "train"
+)
+
+VAL_PATH = os.path.join(
+    DATASET_PATH,
+    "validation"
+)
 
 
 # ======================
@@ -80,7 +95,7 @@ criterion = nn.CrossEntropyLoss()
 
 optimizer = optim.Adam(
     model.parameters(),
-    lr=0.001
+    lr=0.0001
 )
 
 
@@ -95,7 +110,7 @@ os.makedirs("checkpoints", exist_ok=True)
 # Training Config
 # ======================
 
-num_epochs = 10
+num_epochs = 30
 best_accuracy = 0.0
 
 
@@ -178,7 +193,7 @@ for epoch in range(num_epochs):
 
         torch.save(
             model.state_dict(),
-            "checkpoints/fruit_resnet18.pth"
+            SAVE_PATH
         )
 
         print(
