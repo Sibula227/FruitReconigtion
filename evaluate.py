@@ -1,5 +1,6 @@
 import os
 import torch
+import matplotlib.pyplot as plt
 from sklearn.metrics import (
     classification_report,
     confusion_matrix
@@ -136,14 +137,48 @@ print(
 
 
 # ======================
-# Confusion Matrix
+# Confusion Matrix Visualization
 # ======================
+print("\nSaving Confusion Matrix Image...\n")
+cm = confusion_matrix(all_labels, all_predictions)
+plt.figure(figsize=(10, 8))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+            xticklabels=test_dataset.classes, 
+            yticklabels=test_dataset.classes)
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.title('Confusion Matrix')
+plt.savefig('confusion_matrix.png') # Lưu ảnh để cho vào báo cáo
+plt.show()
 
-print("\nConfusion Matrix:\n")
+# ======================
+# Visualizing Sample Predictions
+# ======================
+print("\nSaving Sample Predictions...\n")
+# Lấy 1 batch từ test_loader để vẽ
+images, labels = next(iter(test_loader))
+images, labels = images.to(device), labels.to(device)
+outputs = model(images)
+_, preds = torch.max(outputs, 1)
 
-print(
-    confusion_matrix(
-        all_labels,
-        all_predictions
-    )
-)
+# Chuyển tensor về numpy để hiển thị
+images = images.cpu().numpy()
+fig, axes = plt.subplots(2, 3, figsize=(12, 8))
+for i, ax in enumerate(axes.flat):
+    # Denormalize ảnh
+    img = np.transpose(images[i], (1, 2, 0))
+    mean = np.array([0.485, 0.456, 0.406])
+    std = np.array([0.229, 0.224, 0.225])
+    img = std * img + mean
+    img = np.clip(img, 0, 1)
+    
+    true_cls = test_dataset.classes[labels[i].item()]
+    pred_cls = test_dataset.classes[preds[i].item()]
+    
+    ax.imshow(img)
+    ax.set_title(f"True: {true_cls}\nPred: {pred_cls}", 
+                 color=("green" if true_cls == pred_cls else "red"))
+    ax.axis('off')
+plt.tight_layout()
+plt.savefig('sample_predictions.png')
+plt.show()
