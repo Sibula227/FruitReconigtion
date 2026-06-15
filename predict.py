@@ -21,7 +21,7 @@ num_classes = len(classes)
 # Tải Mô Hình Đã Train
 # ======================
 model = create_model(num_classes)
-model_path = "checkpoints/fruit_resnet18.pth"
+model_path = "checkpoints/model_fruit_8classes.pth"
 
 if not os.path.exists(model_path):
     print(f"Lỗi: Không tìm thấy file weights tại {model_path}!")
@@ -72,8 +72,8 @@ def predict_image(image_path):
 # ======================
 # Chạy Thử Nghiệm
 # ======================
-# Bạn hãy tải 1 bức ảnh trái cây từ mạng về, up lên Kaggle và sửa tên file ở dưới đây:
-IMAGE_TO_TEST = "test_image.jpg" # <--- THAY ĐỔI ĐƯỜNG DẪN ẢNH CỦA BẠN VÀO ĐÂY
+#  tải 1 bức ảnh trái cây từ mạng về, up lên Kaggle và sửa tên file ở dưới đây:
+IMAGE_TO_TEST = "test/cucumber_test2.jpg" # <--- THAY ĐỔI ĐƯỜNG DẪN ẢNH CỦA BẠN VÀO ĐÂY
 
 print(f"\nĐang tiến hành dự đoán ảnh: {IMAGE_TO_TEST}...")
 predict_image(IMAGE_TO_TEST)
