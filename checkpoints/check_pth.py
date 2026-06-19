@@ -1,7 +1,7 @@
 import torch
 
 # Đường dẫn tới file .pth bạn đang có
-file_path = r"checkpoints/fruit_resnet18.pth" 
+file_path = r"model_fruit_8classes.pth" 
 
 # Tải từ điển trọng số lên CPU
 weights = torch.load(file_path, map_location="cpu", weights_only=True)
