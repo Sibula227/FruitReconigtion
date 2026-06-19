@@ -158,12 +158,16 @@ for epoch in range(num_epochs):
     # THÊM MỚI: Lưu lại giá trị loss và accuracy của epoch này vào list
     train_losses.append(avg_loss)
     val_accuracies.append(accuracy)
+    train_accuracy = (
+        100 * train_correct / train_total
+)
 
     print(
-        f"Epoch [{epoch + 1}/{num_epochs}] | "
-        f"Loss: {avg_loss:.4f} | "
-        f"Val Accuracy: {accuracy:.2f}%"
-    )
+    f"Epoch [{epoch + 1}/{num_epochs}] | "
+    f"Loss: {avg_loss:.4f} | "
+    f"Train Accuracy: {train_accuracy:.2f}% | "
+    f"Val Accuracy: {accuracy:.2f}%"
+)
 
     # ======================
     # Save Best Model
