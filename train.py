@@ -86,10 +86,11 @@ criterion = nn.CrossEntropyLoss()
 # ======================
 # Optimizer
 # ======================
-
+# ĐÃ CẬP NHẬT: Thêm weight_decay=1e-4 để thực hiện kỹ thuật L2 Regularization phạt trọng số lớn
 optimizer = optim.Adam(
     model.parameters(),
-    lr=0.0001
+    lr=0.0001,
+    weight_decay=1e-4  
 )
 
 # ======================
@@ -105,8 +106,9 @@ os.makedirs("checkpoints", exist_ok=True)
 num_epochs = 30
 best_accuracy = 0.0
 
-# THÊM MỚI: Khởi tạo 2 list để lưu lịch sử phục vụ vẽ biểu đồ
+# Khởi tạo các list để lưu lịch sử phục vụ vẽ biểu đồ
 train_losses = []
+train_accuracies = []  # ĐÃ SỬA: Thêm list lưu lịch sử Train Accuracy để vẽ biểu đồ đối chiếu
 val_accuracies = []
 
 # ======================
@@ -117,6 +119,10 @@ for epoch in range(num_epochs):
 
     model.train()
     running_loss = 0.0
+    
+    # ĐÃ SỬA: Khởi tạo biến đếm số ảnh đoán đúng và tổng số ảnh của tập Train ở đầu mỗi Epoch
+    train_correct = 0
+    train_total = 0
 
     for images, labels in train_loader:
         images = images.to(device)
@@ -130,8 +136,16 @@ for epoch in range(num_epochs):
         optimizer.step()
 
         running_loss += loss.item()
+        
+        # ĐÃ SỬA: Tính toán số lượng dự đoán đúng thực tế trên tập Train trong khi chạy
+        _, predicted = torch.max(outputs, 1)
+        train_total += labels.size(0)
+        train_correct += (predicted == labels).sum().item()
 
     avg_loss = running_loss / len(train_loader)
+    
+    # ĐÃ SỬA: Tính toán chính xác phần trăm Train Accuracy sau khi kết thúc vòng lặp epoch
+    train_accuracy = 100 * train_correct / train_total
 
     # ======================
     # Validation
@@ -155,19 +169,18 @@ for epoch in range(num_epochs):
 
     accuracy = 100 * correct / total
 
-    # THÊM MỚI: Lưu lại giá trị loss và accuracy của epoch này vào list
+    # Lưu lại giá trị loss và accuracy của epoch này vào list lịch sử
     train_losses.append(avg_loss)
+    train_accuracies.append(train_accuracy)
     val_accuracies.append(accuracy)
-    train_accuracy = (
-        100 * train_correct / train_total
-)
 
+    # ĐÃ SỬA: Định dạng căn lề (Indentation) chuẩn xác 4 dấu cách cho câu lệnh print log hệ thống
     print(
-    f"Epoch [{epoch + 1}/{num_epochs}] | "
-    f"Loss: {avg_loss:.4f} | "
-    f"Train Accuracy: {train_accuracy:.2f}% | "
-    f"Val Accuracy: {accuracy:.2f}%"
-)
+        f"Epoch [{epoch + 1}/{num_epochs}] | "
+        f"Loss: {avg_loss:.4f} | "
+        f"Train Accuracy: {train_accuracy:.2f}% | "
+        f"Val Accuracy: {accuracy:.2f}%"
+    )
 
     # ======================
     # Save Best Model
@@ -201,12 +214,13 @@ plt.title('Training Loss per Epoch')
 plt.grid(True)
 plt.legend()
 
-# Đồ thị 2: Validation Accuracy
+# Đồ thị 2: Đã nâng cấp để hiển thị đồng thời cả đường Train Accuracy và Validation Accuracy
 plt.subplot(1, 2, 2)
+plt.plot(range(1, num_epochs + 1), train_accuracies, label='Train Accuracy', color='orange', marker='o')
 plt.plot(range(1, num_epochs + 1), val_accuracies, label='Validation Accuracy', color='blue', marker='o')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy (%)')
-plt.title('Validation Accuracy per Epoch')
+plt.title('Training & Validation Accuracy per Epoch')
 plt.grid(True)
 plt.legend()
 

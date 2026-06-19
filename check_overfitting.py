@@ -32,7 +32,7 @@ print(f"[Thông tin] Tổng số ảnh tập Validation: {len(val_dataset)}")
 # 3. Nạp Mô Hình Từ Checkpoint Tốt Nhất
 # ======================
 model = create_model(num_classes)
-model_path = "checkpoints/fruit_resnet18.pth"
+model_path = "checkpoints/model_fruit_8classes.pth"
 
 if not os.path.exists(model_path):
     print(f"❌ LỖI: Không tìm thấy file trọng số tại đường dẫn: {model_path}")
