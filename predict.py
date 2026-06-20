@@ -73,7 +73,7 @@ def predict_image(image_path):
 # Chạy Thử Nghiệm
 # ======================
 #  tải 1 bức ảnh trái cây từ mạng về, up lên Kaggle và sửa tên file ở dưới đây:
-IMAGE_TO_TEST = "test/cucumber_test2.jpg" # <--- THAY ĐỔI ĐƯỜNG DẪN ẢNH CỦA BẠN VÀO ĐÂY
+IMAGE_TO_TEST = "test/orange_test3.jpg" # <--- THAY ĐỔI ĐƯỜNG DẪN ẢNH CỦA BẠN VÀO ĐÂY
 
 print(f"\nĐang tiến hành dự đoán ảnh: {IMAGE_TO_TEST}...")
 predict_image(IMAGE_TO_TEST)
