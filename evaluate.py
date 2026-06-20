@@ -34,29 +34,31 @@ DATASET_ROOT = os.environ.get(
     "FruitDataset"
 )
 
-TEST_PATH = os.path.join(
+# ĐÃ SỬA: Thay đổi từ "test" thành "validation" để lấy đúng thư mục tập xác thực
+VAL_PATH = os.path.join(
     DATASET_ROOT,
-    "test"
+    "validation"
 )
 
 
 # ======================
-# Load Test Dataset
+# Load Validation Dataset
 # ======================
 
-test_dataset, test_loader = create_dataloader(
-    TEST_PATH,
-    test_transform,
+# ĐÃ SỬA: Đổi tên biến sang val_dataset và val_loader để chuẩn ngữ nghĩa
+val_dataset, val_loader = create_dataloader(
+    VAL_PATH,
+    test_transform, # Vẫn giữ nguyên bộ transform sạch (chỉ resize, không lật/xoay)
     shuffle=False
 )
 
 print("\nClasses:")
-print(test_dataset.classes)
+print(val_dataset.classes)
 
-num_classes = len(test_dataset.classes)
+num_classes = len(val_dataset.classes)
 
 print(f"\nNumber of classes: {num_classes}")
-print(f"Test images: {len(test_dataset)}")
+print(f"Validation images: {len(val_dataset)}")
 
 
 # ======================
@@ -90,7 +92,7 @@ all_predictions = []
 
 with torch.no_grad():
 
-    for images, labels in test_loader:
+    for images, labels in val_loader:
 
         images = images.to(device)
         labels = labels.to(device)
@@ -119,7 +121,7 @@ with torch.no_grad():
 accuracy = 100 * correct / total
 
 print("\n==========================")
-print(f"Test Accuracy: {accuracy:.2f}%")
+print(f"Validation Accuracy: {accuracy:.2f}%")
 print("==========================\n")
 
 
@@ -127,13 +129,13 @@ print("==========================\n")
 # Classification Report
 # ======================
 
-print("Classification Report:\n")
+print("Validation Classification Report:\n")
 
 print(
     classification_report(
         all_labels,
         all_predictions,
-        target_names=test_dataset.classes
+        target_names=val_dataset.classes
     )
 )
 
@@ -141,24 +143,25 @@ print(
 # ======================
 # Confusion Matrix Visualization
 # ======================
-print("\nSaving Confusion Matrix Image...\n")
+print("\nSaving Validation Confusion Matrix Image...\n")
 cm = confusion_matrix(all_labels, all_predictions)
 plt.figure(figsize=(10, 8))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-            xticklabels=test_dataset.classes, 
-            yticklabels=test_dataset.classes)
+            xticklabels=val_dataset.classes, 
+            yticklabels=val_dataset.classes)
 plt.xlabel('Predicted Label')
 plt.ylabel('True Label')
-plt.title('Confusion Matrix')
-plt.savefig('confusion_matrix.png') # Lưu ảnh để cho vào báo cáo
+plt.title('Validation Confusion Matrix')
+# ĐÃ SỬA: Đổi tên file lưu thành validation_confusion_matrix.png để tránh đè lên tập test
+plt.savefig('validation_confusion_matrix.png') 
 plt.show()
 
 # ======================
 # Visualizing Sample Predictions
 # ======================
-print("\nSaving Sample Predictions...\n")
-# Lấy 1 batch từ test_loader để vẽ
-images, labels = next(iter(test_loader))
+print("\nSaving Validation Sample Predictions...\n")
+# Lấy 1 batch từ val_loader để vẽ
+images, labels = next(iter(val_loader))
 images, labels = images.to(device), labels.to(device)
 outputs = model(images)
 _, preds = torch.max(outputs, 1)
@@ -174,13 +177,14 @@ for i, ax in enumerate(axes.flat):
     img = std * img + mean
     img = np.clip(img, 0, 1)
     
-    true_cls = test_dataset.classes[labels[i].item()]
-    pred_cls = test_dataset.classes[preds[i].item()]
+    true_cls = val_dataset.classes[labels[i].item()]
+    pred_cls = val_dataset.classes[preds[i].item()]
     
     ax.imshow(img)
     ax.set_title(f"True: {true_cls}\nPred: {pred_cls}", 
                  color=("green" if true_cls == pred_cls else "red"))
     ax.axis('off')
 plt.tight_layout()
-plt.savefig('sample_predictions.png')
+# ĐÃ SỬA: Đổi tên file ảnh mẫu dự đoán thành validation_sample_predictions.png
+plt.savefig('validation_sample_predictions.png')
 plt.show()
