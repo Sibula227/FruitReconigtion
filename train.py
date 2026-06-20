@@ -38,12 +38,12 @@ TRAIN_PATH = os.path.join(
     "train"
 )
 
+# ĐÃ SỬA: Đổi từ "validation" thành "valid" để khớp chính xác với Dataset mới của bạn
 VAL_PATH = os.path.join(
     DATASET_PATH,
-    "validation"
+    "valid"
 )
 
-# ĐÃ THÊM MỚI: Khai báo đường dẫn đến tập Test
 TEST_PATH = os.path.join(
     DATASET_PATH,
     "test"
@@ -64,7 +64,6 @@ val_dataset, val_loader = create_dataloader(
     shuffle=False
 )
 
-# ĐÃ THÊM MỚI: Khởi tạo bộ nạp dữ liệu cho tập Test (Dùng test_transform sạch)
 test_dataset, test_loader = create_dataloader(
     TEST_PATH,
     test_transform,
@@ -79,7 +78,7 @@ num_classes = len(train_dataset.classes)
 print(f"\nNumber of classes: {num_classes}")
 print(f"Training images: {len(train_dataset)}")
 print(f"Validation images: {len(val_dataset)}")
-print(f"Test images: {len(test_dataset)}")  # ĐÃ THÊM MỚI
+print(f"Test images: {len(test_dataset)}")
 
 # ======================
 # Model
@@ -94,8 +93,8 @@ print("\nModel Loaded Successfully")
 # ======================
 # Loss Function
 # ======================
-
-criterion = nn.CrossEntropyLoss()
+# ĐÃ CẬP NHẬT: Giữ lại Label Smoothing chống học vẹt, tự động thích ứng với số lượng lớp mới
+criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
 
 # ======================
 # Optimizer
@@ -122,10 +121,10 @@ best_accuracy = 0.0
 # Khởi tạo các list để lưu lịch sử phục vụ vẽ biểu đồ
 train_losses = []
 val_losses = []       
-test_losses = []      # ĐÃ THÊM MỚI: List lưu lịch sử Test Loss
+test_losses = []      
 train_accuracies = []  
 val_accuracies = []
-test_accuracies = []  # ĐÃ THÊM MỚI: List lưu lịch sử Test Accuracy
+test_accuracies = []  
 
 # ======================
 # Training Loop
@@ -188,7 +187,7 @@ for epoch in range(num_epochs):
     avg_val_loss = running_val_loss / len(val_loader)  
 
     # ======================
-    # ĐÃ THÊM MỚI: Test Evaluation
+    # Test Evaluation
     # ======================
     test_correct = 0
     test_total = 0
@@ -215,12 +214,12 @@ for epoch in range(num_epochs):
     # Lưu lại giá trị của epoch này vào list lịch sử
     train_losses.append(avg_loss)
     val_losses.append(avg_val_loss)  
-    test_losses.append(avg_test_loss)  # ĐÃ THÊM MỚI
+    test_losses.append(avg_test_loss)  
     train_accuracies.append(train_accuracy)
     val_accuracies.append(accuracy)
-    test_accuracies.append(test_accuracy)  # ĐÃ THÊM MỚI
+    test_accuracies.append(test_accuracy)  
 
-    # CẬP NHẬT: In đầy đủ log của cả 3 tập dữ liệu để bạn theo dõi
+    # In đầy đủ log của cả 3 tập dữ liệu để theo dõi song song
     print(
         f"Epoch [{epoch + 1}/{num_epochs}] | "
         f"Loss -> Train: {avg_loss:.4f}, Val: {avg_val_loss:.4f}, Test: {avg_test_loss:.4f} | "
@@ -254,7 +253,7 @@ plt.figure(figsize=(14, 5))
 plt.subplot(1, 2, 1)
 plt.plot(range(1, num_epochs + 1), train_losses, label='Train Loss', color='red', marker='o')
 plt.plot(range(1, num_epochs + 1), val_losses, label='Val Loss', color='magenta', marker='o') 
-plt.plot(range(1, num_epochs + 1), test_losses, label='Test Loss', color='green', marker='s') # Đường màu xanh lá vuông cho Test
+plt.plot(range(1, num_epochs + 1), test_losses, label='Test Loss', color='green', marker='s') 
 plt.xlabel('Epochs')
 plt.ylabel('Loss')
 plt.title('Loss per Epoch (Train / Val / Test)')
@@ -265,7 +264,7 @@ plt.legend()
 plt.subplot(1, 2, 2)
 plt.plot(range(1, num_epochs + 1), train_accuracies, label='Train Accuracy', color='orange', marker='o')
 plt.plot(range(1, num_epochs + 1), val_accuracies, label='Validation Accuracy', color='blue', marker='o')
-plt.plot(range(1, num_epochs + 1), test_accuracies, label='Test Accuracy', color='green', marker='s') # Đường màu xanh lá vuông cho Test
+plt.plot(range(1, num_epochs + 1), test_accuracies, label='Test Accuracy', color='green', marker='s') 
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy (%)')
 plt.title('Accuracy per Epoch (Train / Val / Test)')
